@@ -15,6 +15,9 @@
 
 import pygame, sys, os, random, math
 from pygame.locals import *
+import randomWalk
+team1AI = randomWalk.randomWalkAI
+team2AI = randomWalk.randomWalkAI
 
 # WIN???
 SCRIPT_PATH = sys.path[0]
@@ -264,76 +267,6 @@ class pacman ():
 
 
 
-class team1AI ():
-    def __init__(self, inputMap, curPos, rivalPos):
-        self.curAction = 'D'
-        
-    def think(self, curMap, curPos, rivalPos, curGraceTime):
-        curRow, curCol = curPos
-        self.possibleAction = []
-        
-        if not 100<=curMap[curRow, curCol+1]<=199:
-            self.possibleAction.append('R')
-        if not 100<=curMap[curRow, curCol-1]<=199:
-            self.possibleAction.append('L')
-        if not 100<=curMap[curRow+1, curCol]<=199:
-            self.possibleAction.append('D')
-        if not 100<=curMap[curRow-1, curCol]<=199:
-            self.possibleAction.append('U')
-            
-        if len(self.possibleAction)>1:
-            if (self.curAction=='R') and ('L' in self.possibleAction):
-                self.possibleAction.remove('L')
-            if (self.curAction=='L') and ('R' in self.possibleAction):
-                self.possibleAction.remove('R')
-            if (self.curAction=='U') and ('D' in self.possibleAction):
-                self.possibleAction.remove('D')
-            if (self.curAction=='D') and ('U' in self.possibleAction):
-                self.possibleAction.remove('U')
-        
-        
-        nextAction = random.choice(self.possibleAction)
-        self.curAction = nextAction
-                
-        return nextAction
-    
-
-class team2AI ():
-    def __init__(self, inputMap, curPos, rivalPos):
-        self.curAction = 'D'
-        
-    def think(self, curMap, curPos, rivalPos, curGraceTime):
-        curRow, curCol = curPos
-        self.possibleAction = []
-        
-        if not 100<=curMap[curRow, curCol+1]<=199:
-            self.possibleAction.append('R')
-        if not 100<=curMap[curRow, curCol-1]<=199:
-            self.possibleAction.append('L')
-        if not 100<=curMap[curRow+1, curCol]<=199:
-            self.possibleAction.append('D')
-        if not 100<=curMap[curRow-1, curCol]<=199:
-            self.possibleAction.append('U')
-        
-                
-        if len(self.possibleAction)>1:
-            if (self.curAction=='R') and ('L' in self.possibleAction):
-                self.possibleAction.remove('L')
-            if (self.curAction=='L') and ('R' in self.possibleAction):
-                self.possibleAction.remove('R')
-            if (self.curAction=='U') and ('D' in self.possibleAction):
-                self.possibleAction.remove('D')
-            if (self.curAction=='D') and ('U' in self.possibleAction):
-                self.possibleAction.remove('U')
-        
-        
-        nextAction = random.choice(self.possibleAction)
-        self.curAction = nextAction
-                
-        return nextAction
-    
-    
-            
 class level ():
     
     def __init__ (self):
