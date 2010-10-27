@@ -16,7 +16,8 @@
 import pygame, sys, os, random, math
 from pygame.locals import *
 import randomWalk
-team1AI = randomWalk.randomWalkAI
+import threeSixty
+team1AI = threeSixty.threeSixtyAI 
 team2AI = randomWalk.randomWalkAI
 
 # WIN???
