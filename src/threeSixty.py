@@ -3,13 +3,16 @@ from pygame.locals import *
 
 class threeSixtyAI ():
     def __init__(self, inputMap, curPos, rivalPos):
+        self.makeBetterMap(inputMap)
+        
         self.numMoves = 0
         self.curAction = 'D'
         self.untilRandom = -1
-        self.floydWarshall(inputMap)
+        self.graphify(betterMap)
+        #self.floydWarshall(inputMap)
 
-#----------Floyd-Warshall Algorithm-----------#
-    def floydWarshall(self, map):
+    #Puts the map into a better form
+    def makeBetterMap(self, map):
         self.maxFirst = 0
         self.maxSecond = 0
 
@@ -21,54 +24,68 @@ class threeSixtyAI ():
             if i[1] > self.maxSecond:
                 self.maxSecond = i[1]
 
-        betterMap = []
+        self.betterMap = []
         for i in range(self.maxFirst):
-            betterMap.append([])
+            self.betterMap.append([])
             for j in range(self.maxSecond):
-                betterMap[i].append(map[(i,j)])
+                self.betterMap[i].append(map[(i,j)])
 
-        #All-pairs shortest paths (The node at row,col is (row*maxCol)+col)
-        #Initiate array:
-        aBigNumber = self.maxFirst*self.maxSecond*self.maxFirst*self.maxSecond
-        self.allPairsShortestPath = []
-        for i in range(self.maxFirst*self.maxSecond):
-            self.allPairsShortestPath.append([])
-            for j in range(self.maxFirst*self.maxSecond):
-                self.allPairsShortestPath[i].append(aBigNumber)
+    #Take the map and turn it into a graph where the junction points (more than one way to go) are nodes
+    def graphify(self, map):
+        self.junctions = []
+        self.reverseJunctions = {}
+        #Find junctions
+        for i in range(self.maxFirst):
+            for j in range(self.maxSecond):
+                degree = 0
+                if validCoord(i,j+1) and not isWall(self.betterMap[i][j+1]):
+                    degree = degree + 1
+                if validCoord(i,j-1) and not isWall(self.betterMap[i][j-1]):
+                    degree = degree + 1
+                if validCoord(i-1,j) and not isWall(self.betterMap[i-1][j]):
+                    degree = degree + 1
+                if validCoord(i+1,j) and not isWall(self.betterMap[i+1][j]):
+                    degree = degree + 1
+                if degree > 2 or degree == 1:
+                    self.junctions.append((i,j))
+                    self.reverseJunctions[(i,j)] = len(junctions)-1 
 
-        #Initial Values:
-        for i in range(self.maxFirst*self.maxSecond):
-            for j in range(self.maxFirst*self.maxSecond):
-                if j == i-1 and not self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
-                    self.allPairsShortestPath[i][j] = 1
-                elif j == i+1 and not self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
-                    self.allPairsShortestPath[i][j] = 1
-                elif j == (i - self.maxFirst) and not self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
-                    self.allPairsShortestPath[i][j] = 1
-                elif j == (i + self.maxFirst) and not self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
-                    self.allPairsShortestPath[i][j] = 1
-                else:
-                    self.allPairsShortestPath[i][j] = aBigNumber
+        #Create adjacency matrix for junctions
+        self.junctAdj = []
+        for i in range(len(self.junctions)):
+            self.junctAdj.append([])
+            for j in range(len(self.junctions)):
+                self.junctAdj[i].append(0)
 
-        #Run algorithm:
-        for k in range(self.maxFirst*self.maxSecond):
-            if self.isWall(betterMap[self.firstCoord(k)][self.secondCoord(k)]):
-                continue
-            print k
-            for i in range(self.maxFirst*self.maxSecond):
-                if self.isWall(betterMap[self.firstCoord(i)][self.secondCoord(i)]):
-                    continue
-                for j in range(self.maxFirst*self.maxSecond):
-                    if self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
-                        continue
-                    self.allPairsShortestPath[i][j] = min(self.allPairsShortestPath[i][j], \
-                        self.allPairsShortestPath[i][k] + self.allPairsShortestPath[k][j])
-#----------End really long block of code I hate Python---------#
+        for i in range(len(self.junctions)):
+            #Expand Right
+            x,y = self.junctions[i]
+            dir = 'R'
+            canGo = self.validCoord(i+1,j) and not self.isWall(self.betterMap[i+1][j])
+            pathLength = 0
+            while canGo:
+                pathLength = pathLength+1
+                if dir='R':
+                    x = x+1
+                    if (x,y) in self.junctions:
+                        self.junctAdj[reverseJunctions[(x,y)]][i] = pathLength
+                    else:
+                        if self.validCoord(i+1,j)
+                elif dir='L':
+                elif dir='U':
+                elif dir='D':
+            #Expand Up
+            #Expand Left
+            #Expand Down
+
     def firstCoord(self, value):
         return int(value / self.maxSecond)
 
     def secondCoord(self, value):
         return (value % self.maxSecond)
+
+    def validCoord(self, x, y):
+        return (x >= 0) and (y >= 0) and (x <= self.maxFirst) and (y <= self.maxSecond)
 
     def isWall(self, value):
         return (100<=value<=199)

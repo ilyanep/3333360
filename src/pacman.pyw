@@ -17,7 +17,7 @@ import pygame, sys, os, random, math, superGreedy
 from pygame.locals import *
 import randomWalk
 import threeSixty
-team1AI = superGreedy.superGreedyAI 
+team1AI = threeSixty.threeSixtyAI 
 team2AI = randomWalk.randomWalkAI
 
 # WIN???
