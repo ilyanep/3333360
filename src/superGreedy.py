@@ -47,7 +47,7 @@ class superGreedyAI():
             return move
         else:
             if len(self.path) == 0 or curMap[self.target] == 0:
-                self.path, self.target = self.nearestDot(x, y, curMap,35)
+                self.path, self.target = self.nearestDot(x, y, curMap,10)
             print 'Path to dot is ', self.path
             move = self.path[0]
             self.path = self.path[1:]
@@ -120,13 +120,14 @@ class superGreedyAI():
         foundPoints = []
         visited = [[0 for i in range(self.mapWidth+1)] for j in range(self.mapHeight+1)]
         while(1):
-            print len(foundPoints)
             newFrontier = {}
             for k,v in frontier.iteritems():
                 yy, xx = k
                 if xx < self.mapWidth:
                     right = curMap[(yy, xx+1)]
                     if right == 2 and (yy,xx+1) not in foundPoints:
+                        visited[yy][xx+1] = 1
+                        newFrontier[(yy,xx+1)] = v + 'R'
                         foundDots.append((v + 'R', (yy, xx+1)))
                         foundPoints.append((yy,xx+1))
                         if len(foundDots) == numToFind:
@@ -140,6 +141,8 @@ class superGreedyAI():
                 if xx > 0:
                     left = curMap[(yy, xx-1)]
                     if left == 2 and (yy, xx-1) not in foundPoints:
+                        visited[yy][xx-1] = 1
+                        newFrontier[(yy,xx-1)] = v+'L'
                         foundDots.append((v + 'L', (yy, xx-1)))
                         foundPoints.append((yy,xx-1))
                         if len(foundDots) == numToFind:
@@ -153,6 +156,8 @@ class superGreedyAI():
                 if yy > 0:
                     up = curMap[(yy-1, xx)]
                     if up == 2 and (yy-1,xx) not in foundPoints:
+                        visited[yy-1][xx] = 1
+                        newFrontier[(yy-1,xx)] = v + 'U'
                         foundDots.append((v + 'U', (yy-1, xx)))
                         foundPoints.append((yy-1,xx))
                         if len(foundDots) == numToFind:
@@ -166,6 +171,8 @@ class superGreedyAI():
                 if yy < self.mapHeight:
                     down = curMap[(yy+1,xx)]
                     if down == 2 and (yy+1,xx) not in foundPoints:
+                        visited[yy+1][xx] = 1
+                        newFrontier[(yy+1,xx)] = v + 'D'
                         foundDots.append((v + 'D', (yy+1,xx)))
                         foundPoints.append((yy+1,xx))
                         if len(foundDots) == numToFind:
