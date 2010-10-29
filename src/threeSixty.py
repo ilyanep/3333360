@@ -11,8 +11,8 @@ class threeSixtyAI ():
         self.graphify(self.betterMap)
         #self.floydWarshall(inputMap)
 
-    #Puts the map into a better form
     def makeBetterMap(self, map):
+        '''Takes the map in dict(tuple -> int) form and turns it into a 2D list''' 
         self.maxFirst = 0
         self.maxSecond = 0
 
@@ -30,8 +30,10 @@ class threeSixtyAI ():
             for j in range(self.maxSecond+1):
                 self.betterMap[i].append(map[(i,j)])
 
-    #Take the map and turn it into a graph where the junction points (more than one way to go) are nodes
     def graphify(self, map):
+        '''Compresses the graph of the map into a graph of junction points (degree == 1 or degree > 2)
+
+        Takes the map in 2D list form. Returns nothing. Sets some member variables'''
         self.junctions = []
         self.reverseJunctions = {}
         #Find junctions
@@ -78,6 +80,7 @@ class threeSixtyAI ():
             
 
     def expandJunction(self,i,x,y,dir):
+        '''Finds the neighbor of a junction'''
         pathLength = 0
         while canGo:
             pathLength = pathLength+1
@@ -139,15 +142,19 @@ class threeSixtyAI ():
                         continue
 
     def firstCoord(self, value):
+        '''Takes an integer and returns the first coordinate in (row*maxCol) + col form'''
         return int(value / self.maxSecond)
 
     def secondCoord(self, value):
+        '''Takes an integer and returns the second coordinate in (row*maxCol) + col form'''
         return (value % self.maxSecond)
 
-    def validCoord(self, x, y):
+    def validCoord(self, y, x):
+        '''Returns if an (x,y) coordinate pair is valid'''
         return (x >= 0) and (y >= 0) and (x <= self.maxFirst) and (y <= self.maxSecond)
 
     def isWall(self, value):
+        '''Returns true if the value corresponds to that of a wall tile'''
         return (100<=value<=199)
 
     def think(self, curMap, curPos, rivalPos, curGraceTime):
