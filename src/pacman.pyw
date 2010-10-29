@@ -13,11 +13,11 @@
 # - Added joystick support (configure by changing JS_* constants)
 # - Added a high-score list. Depends on wx for querying the user's name
 
-import pygame, sys, os, random, math
+import pygame, sys, os, random, math, superGreedy
 from pygame.locals import *
 import randomWalk
 import threeSixty
-team1AI = threeSixty.threeSixtyAI 
+team1AI = superGreedy.superGreedyAI 
 team2AI = randomWalk.randomWalkAI
 
 # WIN???
