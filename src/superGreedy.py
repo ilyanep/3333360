@@ -39,18 +39,72 @@ class superGreedyAI():
             dotDirs.append('U')
             
         if len(dotDirs) > 0:
-            return random.choice(dotDirs)
+            if len(self.path) == 0:
+                self.path, self.target = self.dottyPath(x, y, 15, curMap)
+            print 'Dotty path is ', self.path
+            move = self.path[0]
+            self.path = self.path[1:]
+            return move
         else:
             if len(self.path) == 0 or curMap[self.target] == 0:
                 self.path, self.target = self.nearestDot(x, y, curMap)
-            print 'Path is ', self.path
+            print 'Path to dot is ', self.path
             move = self.path[0]
             self.path = self.path[1:]
             return move
            
         # visited = [[0 for i in range(self.mapWidth)] for j in range(self.mapHeight)]
             
+    def dottyPath(self, x, y, length, curMap):
+        bestPath = ""
+        target = (y,x)
+        frontier = [((y,x),'')]
+        visited = [(y,x)]
+        lastlen = 0
+        while len(bestPath) < length and len(frontier) > 0:
+            point, path = frontier.pop()
+            if len(path) < lastlen:
+                visited.pop()
+                lastlen = len(path)
+            visited.append(point)
+            yy, xx = point
+            if xx < self.mapWidth and (yy,xx+1) not in visited:
+                right = curMap[(yy,xx+1)]
+                if right == 2:
+                    frontier.append( ((yy,xx+1), path + 'R') )
+                    if len(path) >= len(bestPath):
+                        bestPath = path + 'R'
+                        target = (yy, xx+1)
+            if xx > 0 and (yy,xx-1) not in visited:
+                left = curMap[(yy,xx-1)]
+                if left == 2:
+                    frontier.append( ((yy,xx-1), path + 'L') )
+                    if len(path) >= len(bestPath):
+                        bestPath = path + 'L'
+                        target = (yy, xx-1)
+            if yy < self.mapHeight and (yy+1,xx) not in visited:
+                down = curMap[(yy+1, xx)]
+                if down == 2:
+                    frontier.append( ((yy+1,xx), path + 'D') )
+                    if len(path) >= len(bestPath):
+                        bestPath = path + 'D'
+                        target = (yy+1, xx)
+            if yy > 0 and (yy-1, xx) not in visited:
+                up = curMap[(yy-1, xx)]
+                if up == 2:
+                    frontier.append( ((yy-1, xx), path + 'U') )
+                    if len(path) >= len(bestPath):
+                        bestPath = path + 'U'
+                        target = (yy-1, xx)
+        return (bestPath, target)
+
+        
     def nearestDot(self, x, y, curMap):
+        '''Finds the path from (y,x) to the nearest dot using BFS; 
+        
+        returns (path, (yy, xx)) where path is a string of the characters {U,L,R,D}
+        and (yy, xx) is the location of the nearest dot.
+        '''
         frontier = {(y,x) : ""}
         visited = [[0 for i in range(self.mapWidth)] for j in range(self.mapHeight)]
         while(1):
