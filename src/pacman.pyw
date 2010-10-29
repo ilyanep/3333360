@@ -13,12 +13,13 @@
 # - Added joystick support (configure by changing JS_* constants)
 # - Added a high-score list. Depends on wx for querying the user's name
 
-import pygame, sys, os, random, math, superGreedy
+import pygame, sys, os, random, math, superGreedy, doNothing
 from pygame.locals import *
 import randomWalk
 import threeSixty
-team1AI = threeSixty.threeSixtyAI 
-team2AI = superGreedy.superGreedyAI
+#team1AI = threeSixty.threeSixtyAI 
+team1AI = superGreedy.superGreedyAI
+team2AI = doNothing.doNothingAI
 
 # WIN???
 SCRIPT_PATH = sys.path[0]
@@ -191,10 +192,10 @@ class pacman ():
                 self.curAction = team2.think(thisLevel.map, (self.nearestRow, self.nearestCol), (player[0].nearestRow, player[0].nearestCol), self.graceTime)
             endTime = pygame.time.get_ticks()
             self.executeAction(self.curAction)
-            
+           
             if (endTime-startTime>100):
                 self.graceTime += endTime-startTime-100
-                print "Player " + str(teamID+1) + "used" + str(endTime-startTime-100) + " ms grace time!"
+                print "Player " + str(self.teamID+1) + "used" + str(endTime-startTime-100) + " ms grace time!"
             if self.graceTime>5000:
                 print "Player " + str(self.teamID+1) + " timeout!"
                 thisGame.SetMode(7)

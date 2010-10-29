@@ -47,7 +47,7 @@ class superGreedyAI():
             return move
         else:
             if len(self.path) == 0 or curMap[self.target] == 0:
-                self.path, self.target = self.nearestDot(x, y, curMap)
+                self.path, self.target = self.nearestDot(x, y, curMap,35)
             print 'Path to dot is ', self.path
             move = self.path[0]
             self.path = self.path[1:]
@@ -98,23 +98,39 @@ class superGreedyAI():
                         target = (yy-1, xx)
         return (bestPath, target)
 
+    def numDots(self, curMap):
+        num = 0
+        for yy in range(self.mapHeight+1):
+            for xx in range(self.mapWidth+1):
+                if curMap[(yy,xx)] == 2:
+                    num = num+1
+        return num
         
-    def nearestDot(self, x, y, curMap):
-        '''Finds the path from (y,x) to the nearest dot using BFS; 
+    def nearestDot(self, x, y, curMap, numToFind):
+        '''Finds the path from (y,x) to the nearest dot that is within the biggest cluster
+        when the nearest numToFind dots are considered
         
         returns (path, (yy, xx)) where path is a string of the characters {U,L,R,D}
-        and (yy, xx) is the location of the nearest dot.
+        and (yy, xx) is the location of the dot described above.
         '''
         frontier = {(y,x) : ""}
-        visited = [[0 for i in range(self.mapWidth)] for j in range(self.mapHeight)]
+        maxDots = self.numDots(curMap)
+        numToFind = min(maxDots, numToFind) #Guarantee this many dots are on the board
+        foundDots = []
+        foundPoints = []
+        visited = [[0 for i in range(self.mapWidth+1)] for j in range(self.mapHeight+1)]
         while(1):
-            newFrontier = {};
+            print len(foundPoints)
+            newFrontier = {}
             for k,v in frontier.iteritems():
                 yy, xx = k
                 if xx < self.mapWidth:
                     right = curMap[(yy, xx+1)]
-                    if right == 2:
-                        return (v + 'R', (yy, xx+1))
+                    if right == 2 and (yy,xx+1) not in foundPoints:
+                        foundDots.append((v + 'R', (yy, xx+1)))
+                        foundPoints.append((yy,xx+1))
+                        if len(foundDots) == numToFind:
+                            return self.bestComponentDot(foundDots) #Process components
                     elif right == 0 and not visited[yy][xx+1]:
                         visited[yy][xx+1] = 1
                         newFrontier[(yy,xx+1)] = v + 'R'
@@ -123,8 +139,11 @@ class superGreedyAI():
                         newFrontier[(yy,0)] = v + 'R'
                 if xx > 0:
                     left = curMap[(yy, xx-1)]
-                    if left == 2:
-                        return (v + 'L', (yy, xx-1))
+                    if left == 2 and (yy, xx-1) not in foundPoints:
+                        foundDots.append((v + 'L', (yy, xx-1)))
+                        foundPoints.append((yy,xx-1))
+                        if len(foundDots) == numToFind:
+                            return self.bestComponentDot(foundDots) #Process components
                     elif left == 0 and not visited[yy][xx-1]:
                         visited[yy][xx-1] = 1
                         newFrontier[(yy, xx-1)] = v + 'L'
@@ -133,8 +152,11 @@ class superGreedyAI():
                         newFrontier[(yy, self.mapWidth-1)] = v + 'L'
                 if yy > 0:
                     up = curMap[(yy-1, xx)]
-                    if up == 2:
-                        return (v + 'U', (yy-1, xx))
+                    if up == 2 and (yy-1,xx) not in foundPoints:
+                        foundDots.append((v + 'U', (yy-1, xx)))
+                        foundPoints.append((yy-1,xx))
+                        if len(foundDots) == numToFind:
+                            return self.bestComponentDot(foundDots) #Process components
                     elif up == 0:
                         visited[yy-1][xx] = 1
                         newFrontier[(yy-1,xx)] = v + 'U'
@@ -143,8 +165,11 @@ class superGreedyAI():
                         newFrontier[(self.mapHeight-1,xx)] = v + 'U'
                 if yy < self.mapHeight:
                     down = curMap[(yy+1,xx)]
-                    if down == 2:
-                        return (v + 'D', (yy+1,xx))
+                    if down == 2 and (yy+1,xx) not in foundPoints:
+                        foundDots.append((v + 'D', (yy+1,xx)))
+                        foundPoints.append((yy+1,xx))
+                        if len(foundDots) == numToFind:
+                            return self.bestComponentDot(foundDots) #Process components
                     elif down == 0:
                         visited[yy+1][xx] = 1
                         newFrontier[(yy+1,xx)] = v + 'D'
@@ -153,8 +178,63 @@ class superGreedyAI():
                         newFrontier[(0, xx)] = v + 'D'
             frontier = newFrontier
                 
-                
-                
-                
-                
-                
+    def bestComponentDot(self, foundDots):
+        '''Takes a set of dots, finds connected components, and returns the nearest dot in the largest component'''
+        visited = [[0 for i in range(self.mapWidth+1)] for j in range(self.mapHeight+1)]
+        components = []
+        adjacentDots = {} 
+
+        for i in range(len(foundDots)):
+            adjacentDots[foundDots[i][1]] = []
+            for j in range(len(foundDots)):
+                if self.isNeighbor(foundDots[i][1], foundDots[j][1]):
+                    adjacentDots[foundDots[i][1]].append(foundDots[j])
+
+        for i in range(len(foundDots)):
+            if visited[foundDots[i][1][0]][foundDots[i][1][1]]:
+                continue
+            visited[foundDots[i][1][0]][foundDots[i][1][1]] = 1
+            components.append([foundDots[i]])
+            stack = []
+            stack.extend(adjacentDots[foundDots[i][1]])
+            while len(stack)>0:
+                curEl = stack.pop()
+                if visited[curEl[1][0]][curEl[1][1]]:
+                    continue
+                visited[curEl[1][0]][curEl[1][1]] = 1
+                stack.extend(adjacentDots[curEl[1]])
+                components[len(components)-1].append(curEl)
+
+        maxSize = 0
+        which = -1
+        for i in range(len(components)):
+            if len(components[i]) > maxSize:
+                maxSize = len(components[i])
+                which = i
+
+        leastDist = (self.mapWidth+1) * (self.mapHeight+1)
+        whichOne = -1
+        for j in range(len(components[which])):
+            if len(components[which][j][0]) < leastDist:
+                leastDist = len(components[which][j][0])
+                whichOne = j
+
+        print "Components are, ", components
+        print "Chose,", which
+
+        return components[which][whichOne]
+
+    def isNeighbor(self, point1, point2):
+        '''Takes two points and returns if they are neighbors'''
+        yy1, xx1 = point1
+        yy2, xx2 = point2
+
+        if (yy2 == yy1-1) and (xx1 == xx2):
+            return True
+        if (yy2 == yy1+1) and (xx1 == xx2):
+            return True
+        if (xx1 == xx2-1) and (yy1 == yy2):
+            return True
+        if (xx1 == xx2+1) and (yy1 == yy2):
+            return True
+        #TODO: Code for tunnels
