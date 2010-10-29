@@ -5,13 +5,17 @@ class threeSixtyAI ():
     def __init__(self, inputMap, curPos, rivalPos):
         self.numMoves = 0
         self.curAction = 'D'
+        self.untilRandom = -1
 
     def isWall(self, value):
         return (100<=value<=199)
-        
+
     def think(self, curMap, curPos, rivalPos, curGraceTime):
+        print curGraceTime
         curRow, curCol = curPos
-        if self.numMoves < 5 or self.numMoves % 30 == 0:
+        if self.numMoves > self.untilRandom:
+            self.numMoves = 0
+            self.untilRandom = random.randint(1,15)
             self.possibleAction = []
             
             if not 100<=curMap[curRow, curCol+1]<=199:
