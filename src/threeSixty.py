@@ -20,7 +20,12 @@ class threeSixtyAI ():
                 self.maxFirst = i[0]
             if i[1] > self.maxSecond:
                 self.maxSecond = i[1]
-        
+
+        betterMap = []
+        for i in range(self.maxFirst):
+            betterMap.append([])
+            for j in range(self.maxSecond):
+                betterMap[i].append(map[(i,j)])
 
         #All-pairs shortest paths (The node at row,col is (row*maxCol)+col)
         #Initiate array:
@@ -29,32 +34,32 @@ class threeSixtyAI ():
         for i in range(self.maxFirst*self.maxSecond):
             self.allPairsShortestPath.append([])
             for j in range(self.maxFirst*self.maxSecond):
-                self.allPairsShortestPath[i].append([])
+                self.allPairsShortestPath[i].append(aBigNumber)
 
         #Initial Values:
         for i in range(self.maxFirst*self.maxSecond):
             for j in range(self.maxFirst*self.maxSecond):
-                if j == i-1 and not self.isWall(map[(self.firstCoord(j), self.secondCoord(j))]):
+                if j == i-1 and not self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
                     self.allPairsShortestPath[i][j] = 1
-                elif j == i+1 and not self.isWall(map[(self.firstCoord(j), self.secondCoord(j))]):
+                elif j == i+1 and not self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
                     self.allPairsShortestPath[i][j] = 1
-                elif j == (i - self.maxFirst) and not self.isWall(map[(self.firstCoord(j), self.secondCoord(j))]):
+                elif j == (i - self.maxFirst) and not self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
                     self.allPairsShortestPath[i][j] = 1
-                elif j == (i + self.maxFirst) and not self.isWall(map[(self.firstCoord(j), self.secondCoord(j))]):
+                elif j == (i + self.maxFirst) and not self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
                     self.allPairsShortestPath[i][j] = 1
                 else:
                     self.allPairsShortestPath[i][j] = aBigNumber
 
         #Run algorithm:
         for k in range(self.maxFirst*self.maxSecond):
-            if self.isWall(map[(self.firstCoord(k), self.secondCoord(k))]):
+            if self.isWall(betterMap[self.firstCoord(k)][self.secondCoord(k)]):
                 continue
             print k
             for i in range(self.maxFirst*self.maxSecond):
-                if self.isWall(map[(self.firstCoord(i), self.secondCoord(i))]):
+                if self.isWall(betterMap[self.firstCoord(i)][self.secondCoord(i)]):
                     continue
                 for j in range(self.maxFirst*self.maxSecond):
-                    if self.isWall(map[(self.firstCoord(j), self.secondCoord(j))]):
+                    if self.isWall(betterMap[self.firstCoord(j)][self.secondCoord(j)]):
                         continue
                     self.allPairsShortestPath[i][j] = min(self.allPairsShortestPath[i][j], \
                         self.allPairsShortestPath[i][k] + self.allPairsShortestPath[k][j])
