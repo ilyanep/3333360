@@ -18,7 +18,7 @@ from pygame.locals import *
 import randomWalk
 import threeSixty
 team1AI = threeSixty.threeSixtyAI 
-team2AI = randomWalk.randomWalkAI
+team2AI = superGreedy.superGreedyAI
 
 # WIN???
 SCRIPT_PATH = sys.path[0]

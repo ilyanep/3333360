@@ -8,7 +8,7 @@ class threeSixtyAI ():
         self.numMoves = 0
         self.curAction = 'D'
         self.untilRandom = -1
-        self.graphify(betterMap)
+        self.graphify(self.betterMap)
         #self.floydWarshall(inputMap)
 
     #Puts the map into a better form
@@ -25,9 +25,9 @@ class threeSixtyAI ():
                 self.maxSecond = i[1]
 
         self.betterMap = []
-        for i in range(self.maxFirst):
+        for i in range(self.maxFirst+1):
             self.betterMap.append([])
-            for j in range(self.maxSecond):
+            for j in range(self.maxSecond+1):
                 self.betterMap[i].append(map[(i,j)])
 
     #Take the map and turn it into a graph where the junction points (more than one way to go) are nodes
@@ -35,48 +35,108 @@ class threeSixtyAI ():
         self.junctions = []
         self.reverseJunctions = {}
         #Find junctions
-        for i in range(self.maxFirst):
-            for j in range(self.maxSecond):
+        for i in range(self.maxFirst+1):
+            for j in range(self.maxSecond+1):
                 degree = 0
-                if validCoord(i,j+1) and not isWall(self.betterMap[i][j+1]):
+                if self.validCoord(i,j+1) and not self.isWall(self.betterMap[i][j+1]):
                     degree = degree + 1
-                if validCoord(i,j-1) and not isWall(self.betterMap[i][j-1]):
+                if self.validCoord(i,j-1) and not self.isWall(self.betterMap[i][j-1]):
                     degree = degree + 1
-                if validCoord(i-1,j) and not isWall(self.betterMap[i-1][j]):
+                if self.validCoord(i-1,j) and not self.isWall(self.betterMap[i-1][j]):
                     degree = degree + 1
-                if validCoord(i+1,j) and not isWall(self.betterMap[i+1][j]):
+                if self.validCoord(i+1,j) and not self.isWall(self.betterMap[i+1][j]):
                     degree = degree + 1
                 if degree > 2 or degree == 1:
                     self.junctions.append((i,j))
-                    self.reverseJunctions[(i,j)] = len(junctions)-1 
+                    self.reverseJunctions[(i,j)] = len(self.junctions)-1 
 
         #Create adjacency matrix for junctions
         self.junctAdj = []
         for i in range(len(self.junctions)):
             self.junctAdj.append([])
             for j in range(len(self.junctions)):
-                self.junctAdj[i].append(0)
+                self.junctAdj[i].append(-1)
 
         for i in range(len(self.junctions)):
-            #Expand Right
             x,y = self.junctions[i]
-            dir = 'R'
+            #Expand Right
             canGo = self.validCoord(i+1,j) and not self.isWall(self.betterMap[i+1][j])
-            pathLength = 0
-            while canGo:
-                pathLength = pathLength+1
-                if dir='R':
-                    x = x+1
-                    if (x,y) in self.junctions:
-                        self.junctAdj[reverseJunctions[(x,y)]][i] = pathLength
-                    else:
-                        if self.validCoord(i+1,j)
-                elif dir='L':
-                elif dir='U':
-                elif dir='D':
-            #Expand Up
+            if canGo:
+                self.expandJunction(i,x,y,'R')
             #Expand Left
+            canGo = self.validCoord(i-1,j) and not self.isWall(self.betterMap[i-1][j])
+            if canGo:
+                self.expandJunction(i,x,y,'L')
+            #Expand Up
+            canGo = self.validCoord(i,j-1) and not self.isWall(self.betterMap[i][j-1])
+            if canGo:
+                self.expandJunction(i,x,y,'U')
             #Expand Down
+            canGo = self.validCoord(i,j+1) and not self.isWall(self.betterMap[i][j+1])
+            if canGo:
+                self.expandJunction(i,x,y,'D')
+            
+
+    def expandJunction(self,i,x,y,dir):
+        pathLength = 0
+        while canGo:
+            pathLength = pathLength+1
+            if dir=='R':
+                x = x+1
+                if (x,y) in self.junctions:
+                    self.junctAdj[self.reverseJunctions[(x,y)]][i] = pathLength
+                    break
+                else:
+                    if self.validCoord(i+1,j):
+                        continue
+                    elif self.validCoord(i,j-1):
+                        dir = 'U'
+                        continue
+                    elif self.validCoord(i,j+1):
+                        dir = 'D'
+                        continue
+            elif dir=='L':
+                x = x-1
+                if (x,y) in self.junctions:
+                    self.junctAdj[self.reverseJunctions[(x,y)]][i] = pathLength
+                    break
+                else:
+                    if self.validCoord(i-1,j):
+                        continue
+                    elif self.validCoord(i,j-1):
+                        dir = 'U'
+                        continue
+                    elif self.validCoord(i,j+1):
+                        dir = 'D'
+                        continue
+            elif dir=='U':
+                y = y-1
+                if (x,y) in self.junctions:
+                    self.junctAdj[self.reverseJunction[(x,y)]][i] = pathLength
+                    break
+                else:
+                    if self.validCoord(i,j-1):
+                        continue
+                    elif self.validCoord(i+1,j):
+                        dir = 'R'
+                        continue
+                    elif self.validCoord(i-1,j):
+                        dir = 'L'
+                        continue
+            elif dir=='D':
+                y = y+1
+                if (x,y) in self.junctions:
+                    self.junctAdj[self.reverseJunction[(x,y)]][i] = pathLength
+                    break
+                else:
+                    if self.validCoord(i,j+1):
+                        continue
+                    elif self.validCoord(i+1,j):
+                        dir = 'R'
+                        continue
+                    elif self.validCoord(i-1,j):
+                        dir = 'L'
+                        continue
 
     def firstCoord(self, value):
         return int(value / self.maxSecond)
@@ -91,7 +151,6 @@ class threeSixtyAI ():
         return (100<=value<=199)
 
     def think(self, curMap, curPos, rivalPos, curGraceTime):
-        print curGraceTime
         curRow, curCol = curPos
         if self.numMoves > self.untilRandom:
             self.numMoves = 0
