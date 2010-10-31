@@ -13,11 +13,9 @@
 # - Added joystick support (configure by changing JS_* constants)
 # - Added a high-score list. Depends on wx for querying the user's name
 
-import pygame, sys, os, random, math, superGreedy, doNothing
+import pygame, sys, os, random, math
+import threeSixty, doNothing, randomWalk, superGreedy
 from pygame.locals import *
-import randomWalk
-import threeSixty
-#team1AI = threeSixty.threeSixtyAI 
 team1AI = superGreedy.superGreedyAI
 team2AI = doNothing.doNothingAI
 
@@ -184,34 +182,36 @@ class pacman ():
         self.nearestCol = int(((self.x + 8) / 16))
 
         if ((self.y%16)==0 and (self.x%16)==0):
-
             startTime = pygame.time.get_ticks()
             if self.teamID == 0:
                 self.curAction = team1.think(thisLevel.map, (self.nearestRow, self.nearestCol), (player[1].nearestRow, player[1].nearestCol), self.graceTime)
             else:
                 self.curAction = team2.think(thisLevel.map, (self.nearestRow, self.nearestCol), (player[0].nearestRow, player[0].nearestCol), self.graceTime)
+                
             endTime = pygame.time.get_ticks()
             self.executeAction(self.curAction)
-           
+            
             if (endTime-startTime>100):
                 self.graceTime += endTime-startTime-100
-                print "Player " + str(self.teamID+1) + "used" + str(endTime-startTime-100) + " ms grace time!"
+                print "Player " + str(self.teamID+1) + " used " + str(endTime-startTime-100) + " ms grace time!"
             if self.graceTime>5000:
                 print "Player " + str(self.teamID+1) + " timeout!"
                 thisGame.SetMode(7)
             
-        
-        
-
 
         # make sure the current velocity will not cause a collision before moving
         if not thisLevel.CheckIfHitWall((self.x + self.velX, self.y + self.velY), (self.nearestRow, self.nearestCol)):
+
+            # check for collisions with other tiles (pellets, etc)
+            thisLevel.CheckIfHitDoor((self.x, self.y), self.teamID, (self.nearestRow, self.nearestCol))
+            
             # it's ok to Move
             self.x += self.velX
             self.y += self.velY
             
-            # check for collisions with other tiles (pellets, etc)
-            thisLevel.CheckIfHitSomething((self.x, self.y), self.teamID, (self.nearestRow, self.nearestCol))
+            thisLevel.CheckIfHitPellet()
+            
+
             
 
         
@@ -337,55 +337,66 @@ class level ():
             return False
 
 
-    def CheckIfHitSomething (self, playerX_playerY, playerID, row_col):
+    def CheckIfHitDoor (self, playerX_playerY, playerID, row_col):
         row, col = row_col        
         playerX, playerY = playerX_playerY
     
         for iRow in range(row - 1, row + 2, 1):
             for iCol in range(col - 1, col + 2, 1):
-                #FILESTORM
                 if  (math.fabs(playerX - (iCol * 16)) < 8) and (math.fabs(playerY - (iRow * 16)) < 8):
                     # check the offending tile ID
                     result = thisLevel.GetMapTile((iRow, iCol))
-        
-                    if result == tileID[ 'pellet' ]:
-                        # got a pellet
-                        thisLevel.map[iRow, iCol] = 0
-                        snd_pellet[player[playerID].pelletSndNum].play()
-                        player[playerID].pelletSndNum = 1 - player[playerID].pelletSndNum
-                        
-                        thisLevel.pellets -= 1
-                        
-                        thisGame.AddToScore(10, playerID)
-                        
-                        if thisLevel.pellets == 0:
-                            # no more pellets left!
-                            # WON THE LEVEL
-                            thisGame.SetMode(6)
-
-                    elif result == tileID[ 'door-h' ]:
-                        # ran into a horizontal door
-                        for i in range(0, thisLevel.lvlWidth, 1):
-                            if not i == iCol:
-                                if thisLevel.GetMapTile((iRow, i)) == tileID[ 'door-h' ]:
-                                    player[playerID].x = i * 16
-                                    
-                                    if player[playerID].velX > 0:
-                                        player[playerID].x += 16
-                                    else:
-                                        player[playerID].x -= 16
+                    if result == tileID[ 'door-h' ]:
+                        if player[playerID].velX > 0:
+                            player[playerID].x -= (thisLevel.lvlWidth-2)*16;
+                        else:
+                            player[playerID].x += (thisLevel.lvlWidth-2)*16;
                                         
                     elif result == tileID[ 'door-v' ]:
                         # ran into a vertical door
-                        for i in range(0, thisLevel.lvlHeight, 1):
-                            if not i == iRow:
-                                if thisLevel.GetMapTile((i, iCol)) == tileID[ 'door-v' ]:
-                                    player[playerID].y = i * 16
-                                    
-                                    if player[playerID].velY > 0:
-                                        player[playerID].y += 16
-                                    else:
-                                        player[playerID].y -= 16
+                        if player[playerID].velY > 0:
+                            player[playerID].y -= (thisLevel.lvlHeight-2)*16;
+                        else:
+                            player[playerID].y += (thisLevel.lvlHeight-2)*16;
+
+    
+    def CheckIfHitPellet (self):
+        
+        for curID in range(0, 2):
+            col = player[curID].nearestCol
+            row = player[curID].nearestRow
+            
+            curX = player[curID].x
+            curY = player[curID].y
+            oppoX = player[1-curID].x
+            oppoY = player[1-curID].y
+            
+            for iRow in range(row - 1, row + 2, 1):
+                for iCol in range(col - 1, col + 2, 1):
+                    if  (math.fabs(curX - iCol*16) < 4) and (math.fabs(curY - iRow*16) < 4):
+                        # check the offending tile ID
+                        result = thisLevel.GetMapTile((iRow, iCol))
+            
+                        if result == tileID[ 'pellet' ]:
+                            thisLevel.map[iRow, iCol] = 0
+                            thisLevel.pellets -= 1
+                            if (math.fabs(oppoX - iCol*16) < 8) and (math.fabs(oppoY - iRow*16) < 8):
+                                snd_pellet[player[curID].pelletSndNum].play()
+                                snd_pellet[player[1-curID].pelletSndNum].play()
+                                player[curID].pelletSndNum = 1 - player[curID].pelletSndNum
+                                player[1-curID].pelletSndNum = 1 - player[1-curID].pelletSndNum
+                                thisGame.AddToScore(5, curID)
+                                thisGame.AddToScore(5, 1-curID)
+                            else:
+                                snd_pellet[player[curID].pelletSndNum].play()
+                                player[curID].pelletSndNum = 1 - player[curID].pelletSndNum
+                                thisGame.AddToScore(10, curID)
+                            
+                            if thisLevel.pellets == 0:
+                                # no more pellets left!
+                                # WON THE LEVEL
+                                thisGame.SetMode(6)
+
                                         
     def GetPathwayPairPos (self):
         
@@ -737,8 +748,8 @@ thisLevel = level()
 thisLevel.LoadLevel(MILESTONE_MAP_NO)
 
 
-team1 = team1AI(thisLevel.map, (player[0].nearestRow, player[0].nearestCol), (player[1].nearestRow, player[1].nearestCol))
-team2 = team2AI(thisLevel.map, (player[1].nearestRow, player[1].nearestCol), (player[0].nearestRow, player[0].nearestCol))
+team1 = team1AI(thisLevel.map, (player[0].nearestRow, player[0].nearestCol), (player[1].nearestRow, player[1].nearestCol), thisLevel.lvlHeight, thisLevel.lvlWidth)
+team2 = team2AI(thisLevel.map, (player[1].nearestRow, player[1].nearestCol), (player[0].nearestRow, player[0].nearestCol), thisLevel.lvlHeight, thisLevel.lvlWidth)
 
 #print (thisGame.screenSize)
 window = pygame.display.set_mode(thisGame.screenSize, pygame.DOUBLEBUF | pygame.HWSURFACE)

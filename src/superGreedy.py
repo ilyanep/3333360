@@ -2,22 +2,12 @@ import pygame, sys, os, random, math
 from pygame.locals import *
 
 class superGreedyAI():
-    def __init__(self, inputMap, curPos, rivalPos):
+    def __init__(self, inputMap, curPos, rivalPos, mapHeight, mapWidth):
         self.path = ""
-        self.mapHeight = 0
-        self.mapWidth = 0
+        self.mapHeight = mapHeight - 1 #We're passed the height, but we secretly want the highest y coordinate
+        self.mapWidth = mapWidth - 1 #Same
         self.target = (0,0)
-        for k,v in inputMap.iteritems():
-            y, x = k
-            if y > self.mapHeight:
-                self.mapHeight = y
-            if x > self.mapWidth:
-                self.mapWidth = x
-            if v == 20:
-                print '20 is the value of ', k
-            elif v == 21:
-                print '21 is the value of ', k
-        
+    
     def think(self, curMap, curPos, rivalPos, curGraceTime):
         y, x = curPos
         dotDirs = []
@@ -53,7 +43,7 @@ class superGreedyAI():
             self.path = self.path[1:]
             return move
            
-        # visited = [[0 for i in range(self.mapWidth)] for j in range(self.mapHeight)]
+        # visited = [[0 for i in range(self.mapWidth+1)] for j in range(self.mapHeight+1)]
             
     def dottyPath(self, x, y, length, curMap):
         bestPath = ""

@@ -2,7 +2,7 @@ import pygame, sys, os, random, math
 from pygame.locals import *
 
 class threeSixtyAI ():
-    def __init__(self, inputMap, curPos, rivalPos):
+    def __init__(self, inputMap, curPos, rivalPos, mapHeight, mapWidth):
         self.makeBetterMap(inputMap)
         
         self.numMoves = 0

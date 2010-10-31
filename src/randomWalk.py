@@ -2,7 +2,7 @@ import pygame, sys, os, random, math
 from pygame.locals import *
 
 class randomWalkAI ():
-    def __init__(self, inputMap, curPos, rivalPos):
+    def __init__(self, inputMap, curPos, rivalPos, mapHeight, mapWidth):
         self.curAction = 'D'
         
     def think(self, curMap, curPos, rivalPos, curGraceTime):
