@@ -14,11 +14,12 @@
 # - Added a high-score list. Depends on wx for querying the user's name
 
 import pygame, sys, os, random, math
-import threeSixty, doNothing, randomWalk, superGreedy, costAI
+import threeSixty, doNothing, randomWalk, superGreedy, costAI, cheatyTimes
 from pygame.locals import *
 #team1AI = superGreedy.superGreedyAI
 team1AI = costAI.costAI
-team2AI = superGreedy.superGreedyAI
+#team2AI = superGreedy.superGreedyAI
+team2AI = cheatyTimes.cheatyTimesAI
 
 # WIN???
 SCRIPT_PATH = sys.path[0]

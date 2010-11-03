@@ -11,9 +11,18 @@ class costAI():
     def think(self, curMap, curPos, rivalPos, curGraceTime):
         y, x = curPos
         path = self.minCostPath(curPos, 7, curMap, rivalPos)
-        print path
+        print "Min cost path: ",path
+        if len(path) > 0:
+            self.oldpath = ""
         if len(path) == 0:
-            path, self.target = self.nearestDot(x, y, curMap,10)
+            if len(self.oldpath) > 0 and curMap[self.target] == 2:
+                print "Using cached path: ", self.oldpath
+                path = self.oldpath
+            else:
+                path, self.target = self.nearestDot(x, y, curMap,10)
+                print "Using new path: ", path
+            self.oldpath = path[1:]
+            
         return path[0]
         
     def minCostPath(self, start, length, curMap, rivalPos):
