@@ -46,7 +46,7 @@ class costAI():
                     if right == 0 or right == 2:
                         nextPoints.append(['R',(y, x+1)])
                     elif right == 20:
-                        nextPoints.append(['R',(y, 0)])
+                        nextPoints.append(['R',(y, 1)])
                 if y > 0:
                     up = curMap[(y-1, x)]
                     if up == 0 or up == 2:
@@ -58,7 +58,7 @@ class costAI():
                     if down == 0 or down == 2:
                         nextPoints.append(['D',(y+1,x)])
                     elif down == 21:
-                        nextPoints.append(['D', (0, x)])
+                        nextPoints.append(['D', (1, x)])
                     
                 for elem2 in nextPoints:
                     nextDir, nextPoint = elem2
