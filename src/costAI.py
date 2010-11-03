@@ -7,6 +7,7 @@ class costAI():
         self.mapHeight = mapHeight
         self.mapWidth = mapWidth
         self.target = (0,0)
+        self.oldpath = ""
                 
     def think(self, curMap, curPos, rivalPos, curGraceTime):
         y, x = curPos
@@ -100,8 +101,8 @@ class costAI():
         
     def numDots(self, curMap):
         num = 0
-        for yy in range(self.mapHeight):
-            for xx in range(self.mapWidth):
+        for yy in range(self.mapHeight+1):
+            for xx in range(self.mapWidth+1):
                 if curMap[(yy,xx)] == 2:
                     num = num+1
         return num
