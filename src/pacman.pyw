@@ -17,7 +17,9 @@ import pygame, sys, os, random, math
 import threeSixty, doNothing, randomWalk, superGreedy
 from pygame.locals import *
 team1AI = superGreedy.superGreedyAI
-team2AI = doNothing.doNothingAI
+#team2AI = doNothing.doNothingAI
+#team2AI = superGreedy.superGreedyAI
+team2AI = randomWalk.randomWalkAI
 
 # WIN???
 SCRIPT_PATH = sys.path[0]
