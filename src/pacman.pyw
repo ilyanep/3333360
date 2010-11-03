@@ -18,8 +18,9 @@ import threeSixty, doNothing, randomWalk, superGreedy, costAI, cheatyTimes
 from pygame.locals import *
 #team1AI = superGreedy.superGreedyAI
 team1AI = costAI.costAI
-#team2AI = superGreedy.superGreedyAI
-team2AI = cheatyTimes.cheatyTimesAI
+team2AI = superGreedy.superGreedyAI
+#team2AI = cheatyTimes.cheatyTimesAI
+#team2AI = randomWalk.randomWalkAI
 
 # WIN???
 SCRIPT_PATH = sys.path[0]

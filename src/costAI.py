@@ -19,7 +19,7 @@ class costAI():
                 print "Using cached path: ", self.oldpath
                 path = self.oldpath
             else:
-                path, self.target = self.nearestDot(x, y, curMap,10)
+                path, self.target, pathScore = self.nearestDot(x, y, curMap,10)
                 print "Using new path: ", path
             self.oldpath = path[1:]
             
@@ -99,13 +99,16 @@ class costAI():
         return num
         
     def nearestDot(self, x, y, curMap, numToFind):
-        '''Finds the path from (y,x) to the nearest dot that is within the biggest cluster
-        when the nearest numToFind dots are considered
+        '''Finds the path from (y,x) to the nearest dot that is within the best cluster
+        when the nearest numToFind dots are considered. Best cluster is determined
+        by clusterScore = size(cluster) + pathScore of nearest element 
+
+        pathScore = - distance + number of pellets along the path
         
         returns (path, (yy, xx)) where path is a string of the characters {U,L,R,D}
         and (yy, xx) is the location of the dot described above.
         '''
-        frontier = {(y,x) : ""}
+        frontier = {(y,x) : ("",0)}
         maxDots = self.numDots(curMap)
         numToFind = min(maxDots, numToFind) #Guarantee this many dots are on the board
         foundDots = []
@@ -113,82 +116,86 @@ class costAI():
         visited = [[0 for i in range(self.mapWidth+1)] for j in range(self.mapHeight+1)]
         while(1):
             newFrontier = {}
-            for k,v in frontier.iteritems():
+            for k,m in frontier.iteritems():
+                v = m[0]
+                p = m[1]
                 yy, xx = k
                 if xx < self.mapWidth - 1:
                     right = curMap[(yy, xx+1)]
                     if right == 2 and (yy,xx+1) not in foundPoints:
                         visited[yy][xx+1] = 1
-                        newFrontier[(yy,xx+1)] = v + 'R'
-                        foundDots.append((v + 'R', (yy, xx+1)))
+                        newFrontier[(yy,xx+1)] = (v + 'R',p)
+                        foundDots.append((v + 'R', (yy, xx+1), p))
                         foundPoints.append((yy,xx+1))
                         if len(foundDots) == numToFind:
                             return self.bestComponentDot(foundDots) #Process components
                     elif right == 0 and not visited[yy][xx+1]:
                         visited[yy][xx+1] = 1
-                        newFrontier[(yy,xx+1)] = v + 'R'
+                        newFrontier[(yy,xx+1)] = (v + 'R',p-1)
                     elif right == 20 and not visited[yy][0]:
                         visited[yy][0] = 1
-                        newFrontier[(yy,0)] = v + 'R'
+                        newFrontier[(yy,0)] = (v + 'R',p-1)
                 if xx > 0:
                     left = curMap[(yy, xx-1)]
                     if left == 2 and (yy, xx-1) not in foundPoints:
                         visited[yy][xx-1] = 1
-                        newFrontier[(yy,xx-1)] = v+'L'
-                        foundDots.append((v + 'L', (yy, xx-1)))
+                        newFrontier[(yy,xx-1)] = (v+'L',p)
+                        foundDots.append((v + 'L', (yy, xx-1), p))
                         foundPoints.append((yy,xx-1))
                         if len(foundDots) == numToFind:
                             return self.bestComponentDot(foundDots) #Process components
                     elif left == 0 and not visited[yy][xx-1]:
                         visited[yy][xx-1] = 1
-                        newFrontier[(yy, xx-1)] = v + 'L'
+                        newFrontier[(yy, xx-1)] = (v + 'L', p-1)
                     elif left == 20 and not visited[yy][self.mapWidth-1]:
                         visited[yy][self.mapWidth-1] = 1
-                        newFrontier[(yy, self.mapWidth-1)] = v + 'L'
+                        newFrontier[(yy, self.mapWidth-1)] = (v + 'L', p-1)
                 if yy > 0:
                     up = curMap[(yy-1, xx)]
                     if up == 2 and (yy-1,xx) not in foundPoints:
                         visited[yy-1][xx] = 1
-                        newFrontier[(yy-1,xx)] = v + 'U'
-                        foundDots.append((v + 'U', (yy-1, xx)))
+                        newFrontier[(yy-1,xx)] = (v + 'U', p)
+                        foundDots.append((v + 'U', (yy-1, xx), p))
                         foundPoints.append((yy-1,xx))
                         if len(foundDots) == numToFind:
                             return self.bestComponentDot(foundDots) #Process components
                     elif up == 0:
                         visited[yy-1][xx] = 1
-                        newFrontier[(yy-1,xx)] = v + 'U'
+                        newFrontier[(yy-1,xx)] = (v + 'U', p-1)
                     elif up == 21 and not visited[self.mapHeight-1][xx]:
                         visited[self.mapHeight-1][xx] = 1
-                        newFrontier[(self.mapHeight-1,xx)] = v + 'U'
+                        newFrontier[(self.mapHeight-1,xx)] = (v + 'U', p-1)
                 if yy < self.mapHeight - 1:
                     down = curMap[(yy+1,xx)]
                     if down == 2 and (yy+1,xx) not in foundPoints:
                         visited[yy+1][xx] = 1
-                        newFrontier[(yy+1,xx)] = v + 'D'
-                        foundDots.append((v + 'D', (yy+1,xx)))
+                        newFrontier[(yy+1,xx)] = (v + 'D', p)
+                        foundDots.append((v + 'D', (yy+1,xx), p))
                         foundPoints.append((yy+1,xx))
                         if len(foundDots) == numToFind:
                             return self.bestComponentDot(foundDots) #Process components
                     elif down == 0:
                         visited[yy+1][xx] = 1
-                        newFrontier[(yy+1,xx)] = v + 'D'
+                        newFrontier[(yy+1,xx)] = (v + 'D', p-1)
                     elif down == 21 and not visited[0][xx]:
                         visited[0][xx] = 1
-                        newFrontier[(0, xx)] = v + 'D'
+                        newFrontier[(0, xx)] = (v + 'D', p-1)
             frontier = newFrontier
                 
     def bestComponentDot(self, foundDots):
-        '''Takes a set of dots, finds connected components, and returns the nearest dot in the largest component'''
+        '''Takes a set of dots, finds connected components, and returns the nearest dot in the best component'''
         visited = [[0 for i in range(self.mapWidth+1)] for j in range(self.mapHeight+1)]
         components = []
         adjacentDots = {} 
 
+        #Build adjacency list
         for i in range(len(foundDots)):
             adjacentDots[foundDots[i][1]] = []
             for j in range(len(foundDots)):
                 if self.isNeighbor(foundDots[i][1], foundDots[j][1]):
                     adjacentDots[foundDots[i][1]].append(foundDots[j])
 
+        #Build components
         for i in range(len(foundDots)):
             if visited[foundDots[i][1][0]][foundDots[i][1][1]]:
                 continue
@@ -204,19 +211,30 @@ class costAI():
                 stack.extend(adjacentDots[curEl[1]])
                 components[len(components)-1].append(curEl)
 
-        maxSize = 0
+        #Find least dist within each component
+        leastOne = []
+        for i in range(len(components)):
+            leastDist = (self.mapWidth+1) * (self.mapHeight+1)
+            whichOne = -1
+            for j in range(len(components[i])):
+                if len(components[i][j][0]) < leastDist:
+                    leastDist = len(components[i][j][0])
+                    whichOne = j
+            leastOne.append(whichOne)
+
+        #Find size of components
+        sizes = [len(components[i]) for i in range(len(components))]
+
+        compScore = [sizes[i] + components[i][leastOne[i]][2] for i in range(len(components))]
+
+        maxscore = -(self.mapWidth * self.mapHeight * self.mapWidth * self.mapHeight)
         which = -1
         for i in range(len(components)):
-            if len(components[i]) > maxSize:
-                maxSize = len(components[i])
+            if compScore[i] > maxscore:
+                maxscore = compScore[i]
                 which = i
+        whichOne = leastOne[which]
 
-        leastDist = (self.mapWidth+1) * (self.mapHeight+1)
-        whichOne = -1
-        for j in range(len(components[which])):
-            if len(components[which][j][0]) < leastDist:
-                leastDist = len(components[which][j][0])
-                whichOne = j
 
         print "Components are, ", components
         print "Chose,", which
