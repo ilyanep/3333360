@@ -21,6 +21,7 @@ team1AI = costAI.costAI
 team2AI = superGreedy.superGreedyAI
 #team2AI = cheatyTimes.cheatyTimesAI
 #team2AI = randomWalk.randomWalkAI
+#team2AI = doNothing.doNothingAI
 
 # WIN???
 SCRIPT_PATH = sys.path[0]

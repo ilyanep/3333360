@@ -142,7 +142,7 @@ class costAI():
                         newFrontier[(yy,xx+1)] = (v + 'R',p-1)
                     elif right == 20 and not visited[yy][0]:
                         visited[yy][0] = 1
-                        newFrontier[(yy,0)] = (v + 'R',p-1)
+                        newFrontier[(yy,1)] = (v + 'R',p-1)
                 if xx > 0:
                     left = curMap[(yy, xx-1)]
                     if left == 2 and (yy, xx-1) not in foundPoints:
@@ -187,7 +187,7 @@ class costAI():
                         newFrontier[(yy+1,xx)] = (v + 'D', p-1)
                     elif down == 21 and not visited[0][xx]:
                         visited[0][xx] = 1
-                        newFrontier[(0, xx)] = (v + 'D', p-1)
+                        newFrontier[(1, xx)] = (v + 'D', p-1)
             frontier = newFrontier
                 
     def bestComponentDot(self, foundDots):
