@@ -101,8 +101,8 @@ class costAI():
         
     def numDots(self, curMap):
         num = 0
-        for yy in range(self.mapHeight+1):
-            for xx in range(self.mapWidth+1):
+        for yy in range(self.mapHeight):
+            for xx in range(self.mapWidth):
                 if curMap[(yy,xx)] == 2:
                     num = num+1
         return num
