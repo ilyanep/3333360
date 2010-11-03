@@ -39,18 +39,26 @@ class costAI():
                     left = curMap[(y, x-1)]
                     if left == 0 or left == 2:
                         nextPoints.append(['L',(y,x-1)])
+                    elif left == 20:
+                        nextPoints.append(['L',(y, self.mapWidth-1)])
                 if x < self.mapWidth - 1:
                     right = curMap[(y, x+1)]
                     if right == 0 or right == 2:
                         nextPoints.append(['R',(y, x+1)])
+                    elif right == 20:
+                        nextPoints.append(['R',(y, 0)])
                 if y > 0:
                     up = curMap[(y-1, x)]
                     if up == 0 or up == 2:
                         nextPoints.append(['U',(y-1,x)])
+                    elif up == 21:
+                        nextPoints.append(['U',(self.mapHeight-1,x)])
                 if y < self.mapHeight - 1:
                     down = curMap[(y+1,x)]
                     if down == 0 or down == 2:
                         nextPoints.append(['D',(y+1,x)])
+                    elif down == 21:
+                        nextPoints.append(['D', (0, x)])
                     
                 for elem2 in nextPoints:
                     nextDir, nextPoint = elem2
