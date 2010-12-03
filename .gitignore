@@ -1,2 +1,5 @@
 *.pyc
 *.exe
+.project
+.pydevproject
+*.swp
