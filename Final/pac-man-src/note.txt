@@ -1,0 +1,24 @@
+game.mode
+	1 = normal
+	2 = hit ghost
+	3 = game over
+	4 = wait to start
+	5 = wait after eating ghost
+	6 = wait after finishing level
+
+node.type
+	0 for empty space
+	1 for wall
+	2 for starting node
+	3 for end
+
+Node.cost
+	g movement cost
+	h cost to endNode
+	f totalCost
+
+Ghost.state
+	1 normal
+	2 vulnerable
+	3 spectacles
+

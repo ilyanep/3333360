@@ -1,0 +1,5 @@
+ghost score - int
+
+
+def makehiscorelist(self):
+	scoresurf = pygame.Surface((276, 100), HWSURFACE)
