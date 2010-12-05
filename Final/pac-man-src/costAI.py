@@ -8,14 +8,13 @@ class costAI():
         self.mapWidth = mapWidth
         self.target = (0,0)
         self.oldpath = ""
+        self.curAction = "U"
                 
     def think(self, curMap, selfStat, oppoStat, fruitPos, curGraceTime):
-        #If in between squares, we should probably not compute anything
-        print curMap
 
         #constants
-        curPos = (int((selfStat[0][0]+8) / 16), int((selfStat[0][1]+8) / 16))
-        rivalPos = (int((oppoStat[0][0]+8) / 16), int((oppoStat[0][1]+8) / 16))
+        curPos = (int((selfStat[0][1]+8) / 16), int((selfStat[0][0]+8) / 16))
+        rivalPos = (int((oppoStat[0][1]+8) / 16), int((oppoStat[0][0]+8) / 16))
 
         mySuperman = selfStat[1]
         myDigest = selfStat[2]
@@ -27,6 +26,11 @@ class costAI():
         rivalStun = oppoStat[3]
         rivalScore = oppoStat[4]
 
+        #If in between squares, we should probably not compute anything
+        if (selfStat[0][1]%16!=0) | (selfStat[0][0]%16!=0):
+            return self.curAction
+
+        #Actual code
         y, x = curPos
         path = self.minCostPath(curPos, 7, curMap, rivalPos)
         print "Min cost path: ",path
@@ -40,7 +44,7 @@ class costAI():
                 path, self.target, pathScore = self.nearestDot(x, y, curMap,10)
                 print "Using new path: ", path
             self.oldpath = path[1:]
-            
+        self.curAction = path[0] 
         return path[0]
         
     def minCostPath(self, start, length, curMap, rivalPos):
