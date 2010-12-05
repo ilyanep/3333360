@@ -27,10 +27,12 @@ class costAI():
         rivalScore = oppoStat[4]
 
         #If in between squares, we should probably not compute anything
+        #TODO: Unless opponent has recently become super pacman
         if (selfStat[0][1]%16!=0) | (selfStat[0][0]%16!=0):
             return self.curAction
 
         #Actual code
+        #TODO: Panic mode if opponent is super pacman
         y, x = curPos
         path = self.minCostPath(curPos, 7, curMap, rivalPos)
         print "Min cost path: ",path
@@ -48,6 +50,8 @@ class costAI():
         return path[0]
         
     def minCostPath(self, start, length, curMap, rivalPos):
+    #TODO: Factor in digestion times and opponent as super pacman and me as superpacman
+    #into cost function
         frontier = [(([start], "", 0))]
         for i in range(length):
             if len(frontier) == 0:
@@ -138,6 +142,8 @@ class costAI():
         returns (path, (yy, xx)) where path is a string of the characters {U,L,R,D}
         and (yy, xx) is the location of the dot described above.
         '''
+        #TODO: Factor opponent as super pacman, me as super pacman, and digestion times into
+        #pathScore
         frontier = {(y,x) : ("",0)}
         maxDots = self.numDots(curMap)
         numToFind = min(maxDots, numToFind) #Guarantee this many dots are on the board
