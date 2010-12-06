@@ -142,7 +142,6 @@ class costAI():
         returns (path, (yy, xx)) where path is a string of the characters {U,L,R,D}
         and (yy, xx) is the location of the dot described above.
         '''
-        if m
         frontier = {(y,x) : ("",0)}
         maxDots = self.numDots(curMap)
         numToFind = min(maxDots, numToFind) #Guarantee this many dots are on the board
