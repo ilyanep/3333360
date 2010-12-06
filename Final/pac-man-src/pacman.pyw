@@ -1240,7 +1240,6 @@ while True:
 
             
     elif thisGame.mode == 7:
-        sys.exit(0)
         # flashing maze after finishing level
         thisGame.modeTimer += 1
         
@@ -1261,6 +1260,7 @@ while True:
         elif thisGame.modeTimer == 150:
             print TEAM_NAMES[0]+' score: '+str(thisGame.score[0])+"     Grace time: "+str(player[0].graceTime)
             print TEAM_NAMES[1]+' score: '+str(thisGame.score[1])+"     Grace time: "+str(player[1].graceTime)
+            sys.exit(0)
             
             
     

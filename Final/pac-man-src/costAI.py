@@ -14,7 +14,10 @@ class costAI():
 
         #constants
         curPos = (int((selfStat[0][1]+8) / 16), int((selfStat[0][0]+8) / 16))
+        self.curPos = curPos
         rivalPos = (int((oppoStat[0][1]+8) / 16), int((oppoStat[0][0]+8) / 16))
+        self.rivalPos = rivalPos
+        self.fruitPos = (int((fruitPos[1]+8) / 16), int((fruitPos[0]+8)/16))
 
         self.mySuperman = selfStat[1]
         self.myDigest = selfStat[2]
@@ -142,6 +145,14 @@ class costAI():
         returns (path, (yy, xx)) where path is a string of the characters {U,L,R,D}
         and (yy, xx) is the location of the dot described above.
         '''
+        if self.mySuperman > 0:
+            print "I am a superman"
+            dotPenalty = 0
+            framePenalty = 16
+        elif self.mySuperman == 0:
+            print "I am not a superman"
+            dotPenalty = 5
+            framePenalty = 16
         frontier = {(y,x) : ("",0)}
         maxDots = self.numDots(curMap)
         numToFind = min(maxDots, numToFind) #Guarantee this many dots are on the board
@@ -158,67 +169,78 @@ class costAI():
                     right = curMap[(yy, xx+1)]
                     if right == 2 and (yy,xx+1) not in foundPoints:
                         visited[yy][xx+1] = 1
-                        newFrontier[(yy,xx+1)] = (v + 'R',p)
-                        foundDots.append((v + 'R', (yy, xx+1), p))
+                        newFrontier[(yy,xx+1)] = (v + 'R',p-framePenalty-dotPenalty+16)
+                        foundDots.append((v + 'R', (yy, xx+1), p-framePenalty-dotPenalty+16))
                         foundPoints.append((yy,xx+1))
                         if len(foundDots) == numToFind:
                             return self.bestComponentDot(foundDots) #Process components
                     elif right == 0 and not visited[yy][xx+1]:
                         visited[yy][xx+1] = 1
-                        newFrontier[(yy,xx+1)] = (v + 'R',p-1)
+                        newFrontier[(yy,xx+1)] = (v + 'R',p-framePenalty)
                     elif right == 20 and not visited[yy][0]:
                         visited[yy][0] = 1
-                        newFrontier[(yy,1)] = (v + 'R',p-1)
+                        newFrontier[(yy,1)] = (v + 'R',p-framePenalty)
                 if xx > 0:
                     left = curMap[(yy, xx-1)]
                     if left == 2 and (yy, xx-1) not in foundPoints:
                         visited[yy][xx-1] = 1
-                        newFrontier[(yy,xx-1)] = (v+'L',p)
-                        foundDots.append((v + 'L', (yy, xx-1), p))
+                        newFrontier[(yy,xx-1)] = (v+'L',p-framePenalty-dotPenalty+16)
+                        foundDots.append((v + 'L', (yy, xx-1), p-framePenalty-dotPenalty+16))
                         foundPoints.append((yy,xx-1))
                         if len(foundDots) == numToFind:
                             return self.bestComponentDot(foundDots) #Process components
                     elif left == 0 and not visited[yy][xx-1]:
                         visited[yy][xx-1] = 1
-                        newFrontier[(yy, xx-1)] = (v + 'L', p-1)
+                        newFrontier[(yy, xx-1)] = (v + 'L', p-framePenalty)
                     elif left == 20 and not visited[yy][self.mapWidth-1]:
                         visited[yy][self.mapWidth-1] = 1
-                        newFrontier[(yy, self.mapWidth-1)] = (v + 'L', p-1)
+                        newFrontier[(yy, self.mapWidth-1)] = (v + 'L', p-framePenalty)
                 if yy > 0:
                     up = curMap[(yy-1, xx)]
                     if up == 2 and (yy-1,xx) not in foundPoints:
                         visited[yy-1][xx] = 1
-                        newFrontier[(yy-1,xx)] = (v + 'U', p)
-                        foundDots.append((v + 'U', (yy-1, xx), p))
+                        newFrontier[(yy-1,xx)] = (v + 'U', p-framePenalty-dotPenalty+16)
+                        foundDots.append((v + 'U', (yy-1, xx), p-framePenalty-dotPenalty+16))
                         foundPoints.append((yy-1,xx))
                         if len(foundDots) == numToFind:
                             return self.bestComponentDot(foundDots) #Process components
                     elif up == 0:
                         visited[yy-1][xx] = 1
-                        newFrontier[(yy-1,xx)] = (v + 'U', p-1)
+                        newFrontier[(yy-1,xx)] = (v + 'U', p-framePenalty)
                     elif up == 21 and not visited[self.mapHeight-1][xx]:
                         visited[self.mapHeight-1][xx] = 1
-                        newFrontier[(self.mapHeight-1,xx)] = (v + 'U', p-1)
+                        newFrontier[(self.mapHeight-1,xx)] = (v + 'U', p-framePenalty)
                 if yy < self.mapHeight - 1:
                     down = curMap[(yy+1,xx)]
                     if down == 2 and (yy+1,xx) not in foundPoints:
                         visited[yy+1][xx] = 1
-                        newFrontier[(yy+1,xx)] = (v + 'D', p)
-                        foundDots.append((v + 'D', (yy+1,xx), p))
+                        newFrontier[(yy+1,xx)] = (v + 'D', p-framePenalty-dotPenalty+16)
+                        foundDots.append((v + 'D', (yy+1,xx), p-framePenalty-dotPenalty+16))
                         foundPoints.append((yy+1,xx))
                         if len(foundDots) == numToFind:
                             return self.bestComponentDot(foundDots) #Process components
                     elif down == 0:
                         visited[yy+1][xx] = 1
-                        newFrontier[(yy+1,xx)] = (v + 'D', p-1)
+                        newFrontier[(yy+1,xx)] = (v + 'D', p-framePenalty)
                     elif down == 21 and not visited[0][xx]:
                         visited[0][xx] = 1
-                        newFrontier[(1, xx)] = (v + 'D', p-1)
+                        newFrontier[(1, xx)] = (v + 'D', p-framePenalty)
             frontier = newFrontier
                 
     def bestComponentDot(self, foundDots):
         '''Takes a set of dots, finds connected components, and returns the nearest dot in the best component'''
-        #TODO: Fruit and superpacman
+        if self.rivalSuperman > 0:
+            print "Opponent is a superman"
+            oppPenalty = 16
+            fruitBonus = 0
+        elif self.rivalSuperman == 0:
+            print "Opponent is not a superman"
+            oppPenalty = 0
+            if self.fruitPos[0] > 0 and self.fruitPos[1] > 0:
+                fruitBonus = 5
+            else:
+                fruitBonus = 0
+
         visited = [[0 for i in range(self.mapWidth+1)] for j in range(self.mapHeight+1)]
         components = []
         adjacentDots = {} 
@@ -260,7 +282,11 @@ class costAI():
         #Find size of components
         sizes = [len(components[i]) for i in range(len(components))]
 
-        compScore = [sizes[i] + components[i][leastOne[i]][2] for i in range(len(components))]
+        print components[i][leastOne[i]][1]
+
+        compScore = [16*sizes[i] + components[i][leastOne[i]][2] + \
+            oppPenalty*self.ellOneNorm(components[i][leastOne[i]][1], self.rivalPos) - 
+            fruitBonus*self.ellOneNorm(components[i][leastOne[i]][1], self.fruitPos) for i in range(len(components))]
 
         maxscore = -(self.mapWidth * self.mapHeight * self.mapWidth * self.mapHeight)
         which = -1
@@ -275,6 +301,10 @@ class costAI():
         print "Chose,", which
 
         return components[which][whichOne]
+
+    def ellOneNorm(self, p1, p2):
+        '''Returns the l1 norm of two points'''
+        return abs(p1[0]-p2[0])+abs(p1[1]-p2[1])
 
     def isNeighbor(self, point1, point2):
         '''Takes two points and returns if they are neighbors'''
