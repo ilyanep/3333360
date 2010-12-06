@@ -16,15 +16,15 @@ class costAI():
         curPos = (int((selfStat[0][1]+8) / 16), int((selfStat[0][0]+8) / 16))
         rivalPos = (int((oppoStat[0][1]+8) / 16), int((oppoStat[0][0]+8) / 16))
 
-        mySuperman = selfStat[1]
-        myDigest = selfStat[2]
-        myStun = selfStat[3]
-        myScore = selfStat[4]
-        
-        rivalSuperman = oppoStat[1]
-        rivalDigest = oppoStat[2]
-        rivalStun = oppoStat[3]
-        rivalScore = oppoStat[4]
+        self.mySuperman = selfStat[1]
+        self.myDigest = selfStat[2]
+        self.myStun = selfStat[3]
+        self.myScore = selfStat[4]
+
+        self.rivalSuperman = oppoStat[1]
+        self.rivalDigest = oppoStat[2]
+        self.rivalStun = oppoStat[3]
+        selfrivalScore = oppoStat[4]
 
         #If in between squares, we should probably not compute anything
         #TODO: Unless opponent has recently become super pacman
@@ -136,14 +136,13 @@ class costAI():
         '''Finds the path from (y,x) to the nearest dot that is within the best cluster
         when the nearest numToFind dots are considered. Best cluster is determined
         by clusterScore = size(cluster) + pathScore of nearest element 
+      
+        pathScore = - expected frames to traverse + 16*number of dots picked up 
 
-        pathScore = - distance + number of pellets along the path
-        
         returns (path, (yy, xx)) where path is a string of the characters {U,L,R,D}
         and (yy, xx) is the location of the dot described above.
         '''
-        #TODO: Factor opponent as super pacman, me as super pacman, and digestion times into
-        #pathScore
+        if m
         frontier = {(y,x) : ("",0)}
         maxDots = self.numDots(curMap)
         numToFind = min(maxDots, numToFind) #Guarantee this many dots are on the board
@@ -220,6 +219,7 @@ class costAI():
                 
     def bestComponentDot(self, foundDots):
         '''Takes a set of dots, finds connected components, and returns the nearest dot in the best component'''
+        #TODO: Fruit and superpacman
         visited = [[0 for i in range(self.mapWidth+1)] for j in range(self.mapHeight+1)]
         components = []
         adjacentDots = {} 
