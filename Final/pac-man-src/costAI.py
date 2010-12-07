@@ -104,6 +104,8 @@ class costAI():
                     newFrontier.append((newPath, newStrPath, newCost))
             frontier = newFrontier
         minCost = 10
+        if self.panic:
+            minCost = 1000000000
         bestPath = ""
         for elem in frontier:
             path, strPath, cost = elem
@@ -131,10 +133,12 @@ class costAI():
                 cost = cost + 10
             else:
                 cost = cost - 10
+        if self.panic and self.ellOneNorm(path[0],rivalPos) > self.ellOneNorm(point, rivalPos):
+            cost = cost + 100
         if yr-length < y1 < yr+length and xr-length < x1 < xr+length:
             cost = cost + 100 / (length*length)
-        if yf > 0 and xf > 0:
-            fruitDist = 0
+        if yf-length < y1 < yf+length and xf-length < x1 < xf+length:
+            cost = cost - 100 / (length*length)
         return cost
         
         
