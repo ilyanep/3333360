@@ -30,11 +30,6 @@ class costAI():
         self.rivalStun = oppoStat[3]
         self.rivalScore = oppoStat[4]
 
-        if self.panic == True:
-            print "Panic mode is on"
-        else:
-            print "Panic mode is off"
-
         if self.rivalSuperman > 0 and self.ellOneNorm(curPos, rivalPos) < 5:
             self.panic = True
 
@@ -132,7 +127,10 @@ class costAI():
             pellet = 1
         cost = dist
         if pellet and not visited:
-            cost = cost - 10
+            if self.panic:
+                cost = cost + 10
+            else:
+                cost = cost - 10
         if yr-length < y1 < yr+length and xr-length < x1 < xr+length:
             cost = cost + 100 / (length*length)
         if yf > 0 and xf > 0:
