@@ -37,7 +37,6 @@ class costAI():
             self.panic = False
 
         #If in between squares, we should probably not compute anything
-        #TODO: Unless opponent has recently become super pacman
         if (selfStat[0][1]%16!=0) | (selfStat[0][0]%16!=0):
             return self.curAction
 
@@ -99,10 +98,13 @@ class costAI():
                     nextDir, nextPoint = elem2
                     newPath = path + [nextPoint]
                     newCost = cost + cost + self.spaceCost(path, nextPoint, curMap, rivalPos)
+                    #newCost = cost + self.spaceCost(path, nextPoint, curMap, rivalPos)
                     newStrPath = strPath + nextDir
                     newFrontier.append((newPath, newStrPath, newCost))
             frontier = newFrontier
         minCost = 10
+        if self.panic:
+            minCost = 1000000000
         bestPath = ""
         for elem in frontier:
             path, strPath, cost = elem
@@ -115,6 +117,7 @@ class costAI():
         y0, x0 = path[0]
         y1, x1 = point
         yr, xr = rivalPos
+        yf, xf = self.fruitPos
         length = len(path)
         dist = abs(x0-x1) + abs(y0-y1)
         pellet = 0
@@ -125,9 +128,16 @@ class costAI():
             pellet = 1
         cost = dist
         if pellet and not visited:
-            cost = cost - 10
+            if self.panic:
+                cost = cost + 10
+            else:
+                cost = cost - 10
+        if self.panic and self.ellOneNorm(path[0],rivalPos) > self.ellOneNorm(point, rivalPos):
+            cost = cost + 100
         if yr-length < y1 < yr+length and xr-length < x1 < xr+length:
             cost = cost + 100 / (length*length)
+        if yf-length < y1 < yf+length and xf-length < x1 < xf+length:
+            cost = cost - 100 / (length*length)
         return cost
         
         
