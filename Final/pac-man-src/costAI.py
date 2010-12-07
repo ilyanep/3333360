@@ -93,6 +93,7 @@ class costAI():
                     nextDir, nextPoint = elem2
                     newPath = path + [nextPoint]
                     newCost = cost + cost + self.spaceCost(path, nextPoint, curMap, rivalPos)
+                    #newCost = cost + self.spaceCost(path, nextPoint, curMap, rivalPos)
                     newStrPath = strPath + nextDir
                     newFrontier.append((newPath, newStrPath, newCost))
             frontier = newFrontier
@@ -109,6 +110,7 @@ class costAI():
         y0, x0 = path[0]
         y1, x1 = point
         yr, xr = rivalPos
+        yf, xf = self.fruitPos
         length = len(path)
         dist = abs(x0-x1) + abs(y0-y1)
         pellet = 0
@@ -122,6 +124,8 @@ class costAI():
             cost = cost - 10
         if yr-length < y1 < yr+length and xr-length < x1 < xr+length:
             cost = cost + 100 / (length*length)
+        if yf > 0 and xf > 0:
+            fruitDist = 0
         return cost
         
         

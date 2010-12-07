@@ -18,7 +18,8 @@ from pygame.locals import *
 #Insert AI import statements here
 import randomWalk, doNothing, cheatyTimes, costAI
 
-team1AI = randomWalk.randomWalkAI
+team1AI = doNothing.doNothingAI
+#team1AI = randomWalk.randomWalkAI
 #team2AI = randomWalk.randomWalkAI
 #team2AI = doNothing.doNothingAI
 #team2AI = cheatyTimes.cheatyTimesAI
