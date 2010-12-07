@@ -30,15 +30,10 @@ class costAI():
         self.rivalStun = oppoStat[3]
         self.rivalScore = oppoStat[4]
 
-        if self.panic == True:
-            print "Panic mode is on"
-        else:
-            print "Panic mode is off"
-
-        if self.rivalSuperman > 0 and self.ellOneNorm(curPos, rivalPos) < 5:
+        if self.rivalSuperman > 0 and self.ellOneNorm(curPos, rivalPos) < 4:
             self.panic = True
 
-        if self.panic == True and (self.rivalSuperman == 0 or self.ellOneNorm(curPos, rivalPos) >= 8): 
+        if self.panic == True and (self.rivalSuperman == 0 or self.ellOneNorm(curPos, rivalPos) >= 7): 
             self.panic = False
 
         #If in between squares, we should probably not compute anything
