@@ -9,9 +9,10 @@ class costAI():
         self.target = (0,0)
         self.oldpath = ""
         self.curAction = "U"
+        self.wasSuperman = False
+        self.panic = False
                 
     def think(self, curMap, selfStat, oppoStat, fruitPos, curGraceTime):
-
         #constants
         curPos = (int((selfStat[0][1]+8) / 16), int((selfStat[0][0]+8) / 16))
         self.curPos = curPos
@@ -27,7 +28,13 @@ class costAI():
         self.rivalSuperman = oppoStat[1]
         self.rivalDigest = oppoStat[2]
         self.rivalStun = oppoStat[3]
-        selfrivalScore = oppoStat[4]
+        self.rivalScore = oppoStat[4]
+
+        if self.rivalSuperman > 0 and ellOneNorm(curPos, rivalPos) < 5:
+            self.panic = True
+
+        if self.panic == True and (self.rivalSuperman == 0 or ellOneNorm(curPos, rivalPos) >= 8): 
+            self.panic = False
 
         #If in between squares, we should probably not compute anything
         #TODO: Unless opponent has recently become super pacman
@@ -35,7 +42,6 @@ class costAI():
             return self.curAction
 
         #Actual code
-        #TODO: Panic mode if opponent is super pacman
         y, x = curPos
         path = self.minCostPath(curPos, 7, curMap, rivalPos)
         print "Min cost path: ",path
@@ -241,7 +247,7 @@ class costAI():
             print "Opponent is not a superman"
             oppPenalty = 0
             if self.fruitPos[0] > 0 and self.fruitPos[1] > 0:
-                fruitBonus = 5
+                fruitBonus = 2
             else:
                 fruitBonus = 0
 
