@@ -33,6 +33,9 @@ class costAI():
         if self.rivalSuperman > 0 and ellOneNorm(curPos, rivalPos) < 5:
             self.panic = True
 
+        if self.panic == True and (self.rivalSuperman == 0 or ellOneNorm(curPos, rivalPos) >= 8): 
+            self.panic = False
+
         #If in between squares, we should probably not compute anything
         #TODO: Unless opponent has recently become super pacman
         if (selfStat[0][1]%16!=0) | (selfStat[0][0]%16!=0):
