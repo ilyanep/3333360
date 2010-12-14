@@ -19,7 +19,9 @@ from pygame.locals import *
 import randomWalk, doNothing, cheatyTimes, costAI
 
 team1AI = costAI.costAI
-team2AI = doNothing.doNothingAI
+#team2AI = doNothing.doNothingAI
+team2AI = randomWalk.randomWalkAI
+#team2AI = costAI.costAI
 
 # WIN???
 SCRIPT_PATH = sys.path[0]
